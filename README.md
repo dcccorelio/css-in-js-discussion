@@ -9,10 +9,24 @@ In this repo we are comparing 3 approaches:
 - [external css files](https://github.com/webpack-contrib/css-loader) ([sass](https://github.com/webpack-contrib/sass-loader))
 - [styled-components](https://www.styled-components.com/) (no css extraction, pure js)
 - [astroturf](https://github.com/4Catalyzer/astroturf) (css extraction, same api as styled-components)
+- [linaria](https://github.com/callstack/linaria) (css extraction, without styled api)
 
-**Why these 3?** If you look at the css landscape there are [lots of libraries](https://github.com/MicheleBertoli/css-in-js) that want to tackle this problem. We shouldn't think to much about the names of the libraries but more the api's they have and what advantages or disadvantages they have.
+**Why these 4?** If you look at the css landscape there are [lots of libraries](https://github.com/MicheleBertoli/css-in-js) that want to tackle this problem. We shouldn't think to much about the names of the libraries but more the api's they have and what advantages or disadvantages they have.
 
 Code can always be improved and automated please keep that in mind.
+
+## What do we want to accomplish?
+
+In a microfrontend world we talk about html, js & css files which gives us a great benefit of caching and reducing duplication. That's why an approach should support the extract to static css file feature.
+
+We are judging each library on the following criteria:
+
+- styled api
+- classNames (css) API
+- no dynamic props (enforced)
+- static interpolations (when using sass, less, ...)
+- no runtime
+- extract to static css file
 
 ### External css files
 
@@ -44,6 +58,13 @@ function MyComponent(props) {
 export default MyComponent;
 ```
 
+- ❌ styled api
+- ❌ classNames (css) API
+- ✔️ ️ no dynamic props (enforced)
+- ✔️ static interpolations (when using sass, less, ...)
+- ✔️ no runtime
+- ✔️ extract to static css file
+
 ### Styled-components
 
 Styled-components trully is CSS-in-JS built for React. You only think about components & props. Everything is done in runtime, we don't talk about .css files anymore. You have other libraries that have exactly the same api (e.g. [emotion](https://github.com/emotion-js/emotion)).
@@ -61,9 +82,16 @@ const MyComponent = styled.button`
 export default MyComponent
 ```
 
+- ✔️ styled api
+- ✔️ classNames (css) API
+- ❌ no dynamic props (enforced)
+- ✔️ static interpolations
+- ❌ no runtime
+- ❌ extract to static css file
+
 ### Astroturf
 
-Astroturf tries to be a middleground between css & js. It supports the same API as styled-components but does not allow prop changes in the css. It allows constants & functions but nothing at runtime.
+Astroturf tries to be a middleground between css & js. It supports the same API as styled-components but does not allow prop changes in the css. It allows constants & functions if they are in the same file but nothing at runtime.
 
 MyComponent.js
 
@@ -76,6 +104,38 @@ const MyComponent = styled.button`
 
 export default renameProp('theme', 'className')(MyComponent);
 ```
+
+- ✔️ styled api
+- ✔️ classNames (css) API
+- ✔️ no dynamic props (enforced)
+- ❌ static interpolations (only if it's in the same file)
+- ✔️ no runtime
+- ✔️ extract to static css file
+
+### Linaria
+
+Linaria supports a good css api that automatically extracts all css out of your components. It has a styled api, using it means we have to drop IE11 support as it uses css-vars under the hood to accomplish dynamic styling. So we will only use the css function.
+
+MyComponent.js
+
+```js
+import { css } from 'linaria';
+
+const button = css`
+  background-color: #000;
+`;
+
+export default function Button({ children }) {
+  return <button className={button}>{children}</button>;
+}
+```
+
+- ❌ styled api
+- ✔️ classNames (css) API
+- ✔️ no dynamic props (enforced)
+- ✔️ static interpolations
+- ✔️ no runtime
+- ✔️ extract to static css file
 
 ## Things to consider
 
