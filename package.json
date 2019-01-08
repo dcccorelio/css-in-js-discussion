@@ -16,6 +16,7 @@
     "approaches/astroturf/*",
     "approaches/sass/*",
     "approaches/styled-components/*",
-    "design-tokens/"
+    "approaches/linaria/*",
+    "design-tokens"
   ]
 }
